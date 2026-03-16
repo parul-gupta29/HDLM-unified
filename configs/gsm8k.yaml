@@ -1,0 +1,49 @@
+# Config for GSM8K grade-school math experiments.
+# Pass to any script with: --config configs/gsm8k.yaml
+# CLI args always override values here.
+
+dataset: gsm8k
+
+data:
+  train: openai/gsm8k:train
+  test:  openai/gsm8k:test
+
+model:
+  path:          GSAI-ML/LLaDA-8B-Instruct
+  mask_token_id: 126336
+  num_levels:    2
+  max_length:    512
+
+train_hierarchy:
+  batch_size:     8
+  epochs:         5
+  lr:             3.0e-4
+  num_timesteps:  1000
+  output:         checkpoints/gsm8k/hierarchy_predictor.pt
+
+train_generator:
+  batch_size:     4
+  epochs:         3
+  lr:             1.0e-5
+  num_timesteps:  1000
+  output_dir:     checkpoints/gsm8k/generator_lora
+
+train_unified:
+  batch_size:        1
+  grad_accum_steps:  4
+  epochs:            10
+  lr:                1.0e-5
+  num_timesteps:     1000
+  hier_loss_weight:  0.1
+  output_dir:        checkpoints/gsm8k/unified_lora
+  lora_r:            32
+  lora_alpha:        64
+  lora_dropout:      0.05
+
+eval:
+  num_steps:      128
+  num_samples:    1
+  hier_model:     checkpoints/gsm8k/hierarchy_predictor.pt
+  gen_model:      checkpoints/gsm8k/generator_lora
+  unified_model:  checkpoints/unified_lora
+  batch_size:     4

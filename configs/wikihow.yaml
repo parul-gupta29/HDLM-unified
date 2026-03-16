@@ -1,0 +1,33 @@
+# Config for WikiHow procedural text experiments.
+# Pass to any script with: --config configs/wikihow.yaml
+# CLI args always override values here.
+
+dataset: wikihow
+
+data:
+  train: data/wikihow_train.jsonl
+  test:  data/wikihow_test.jsonl
+
+model:
+  path:          GSAI-ML/LLaDA-8B-Instruct
+  mask_token_id: 126336
+  num_levels:    2
+  max_length:    1024
+
+train_unified:
+  batch_size:        1
+  grad_accum_steps:  4
+  epochs:            3
+  lr:                1.0e-5
+  num_timesteps:     1000
+  hier_loss_weight:  0.1
+  output_dir:        checkpoints/wikihow/unified_lora
+  lora_r:            32
+  lora_alpha:        64
+  lora_dropout:      0.05
+
+eval:
+  num_steps:      512
+  num_samples:    1
+  unified_model:  checkpoints/wikihow/unified_lora
+  batch_size:     4
