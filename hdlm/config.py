@@ -82,7 +82,9 @@ def apply_config(parser, section: str):
     argv = sys.argv[1:]
     for i, arg in enumerate(argv):
         if arg in ("--config", "-c") and i + 1 < len(argv):
-            config_path = argv[i + 1]
+            candidate = argv[i + 1]
+            if not candidate.startswith("-"):
+                config_path = candidate
             break
         if arg.startswith("--config="):
             config_path = arg.split("=", 1)[1]

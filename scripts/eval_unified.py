@@ -54,6 +54,10 @@ def parse_args():
     p.add_argument("--num_levels", type=int, default=2)
     p.add_argument("--mask_token_id", type=int, default=126336)
     p.add_argument("--device", default="cuda")
+    p.add_argument("--strategy", default="stochastic",
+                   choices=["stochastic", "topk_pi"],
+                   help="Unmasking strategy: 'stochastic' (Bernoulli on pi) or "
+                        "'topk_pi' (deterministic top gen_len/steps by pi)")
     return p.parse_args()
 
 
@@ -90,7 +94,8 @@ def main():
         args.mask_token_id,
         num_levels=args.num_levels,
         num_steps=args.num_steps,
-        device=args.device
+        device=args.device,
+        strategy=args.strategy,
     )
 
     print("Loading test set...")

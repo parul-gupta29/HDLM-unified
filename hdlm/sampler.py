@@ -22,6 +22,8 @@ class HierarchicalSampler:
     unmasked and never updated again.
     """
 
+    STRATEGIES = ("stochastic", "topk_pi")
+
     def __init__(
         self,
         model,
@@ -29,14 +31,18 @@ class HierarchicalSampler:
         mask_token_id,
         num_levels=2,
         num_steps=128,
-        device="cuda"
+        device="cuda",
+        strategy="stochastic",
     ):
+        assert strategy in self.STRATEGIES, \
+            f"Unknown strategy '{strategy}'. Choose from {self.STRATEGIES}"
         self.model = model
         self.tokenizer = tokenizer
         self.mask_token_id = mask_token_id
         self.num_levels = num_levels
         self.num_steps = num_steps
         self.device = device
+        self.strategy = strategy
 
         self.noise_schedule = HierarchicalNoiseSchedule(
             num_levels=num_levels,
@@ -110,7 +116,17 @@ class HierarchicalSampler:
             pi = (hier_probs * lambda_k).sum(-1)  # (B, L)
 
             masked = (x == self.mask_token_id)
-            to_unmask = (torch.rand_like(pi) < pi) & masked & (~prompt_mask)
+            if self.strategy == "stochastic":
+                to_unmask = (torch.rand_like(pi) < pi) & masked & (~prompt_mask)
+            else:  # topk_pi
+                n_gen = int((~prompt_mask).sum(-1).min().item())
+                n_unmask = max(1, n_gen // self.num_steps)
+                pi_score = pi.clone()
+                pi_score[~masked | prompt_mask] = -float('inf')
+                topk_indices = pi_score.topk(n_unmask, dim=-1).indices
+                to_unmask = torch.zeros_like(masked)
+                to_unmask.scatter_(-1, topk_indices, True)
+                to_unmask = to_unmask & masked & (~prompt_mask)
 
             # Unmask selected positions
             sampled_tokens = token_probs.argmax(-1)

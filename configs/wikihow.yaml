@@ -16,14 +16,14 @@ model:
 
 train_unified:
   batch_size:        1
-  grad_accum_steps:  4
-  epochs:            3
-  lr:                1.0e-5
+  grad_accum_steps:  16
+  epochs:            10
+  lr:                3.0e-5
   num_timesteps:     1000
-  hier_loss_weight:  0.1
+  hier_loss_weight:  0.05
   output_dir:        checkpoints/wikihow/unified_lora
-  lora_r:            32
-  lora_alpha:        64
+  lora_r:            64
+  lora_alpha:        128
   lora_dropout:      0.05
 
 eval:

@@ -48,16 +48,36 @@ python scripts/eval_unified.py \
     --output      results/unified_results_4sample.json
 
 # ─────────────────────────────────────────
-# 3. Baseline — LLaDA-Instruct, no fine-tuning
+# 3. Unified model — stochastic strategy
+# ─────────────────────────────────────────
+python scripts/eval_unified.py \
+    --config   $CONFIG \
+    --strategy stochastic \
+    --output   results/unified_results_stochastic.json
+
+# ─────────────────────────────────────────
+# 4. Unified model — topk_pi strategy
+# ─────────────────────────────────────────
+python scripts/eval_unified.py \
+    --config   $CONFIG \
+    --strategy topk_pi \
+    --output   results/unified_results_topk_pi.json
+
+# ─────────────────────────────────────────
+# 5. Baseline — LLaDA-Instruct, no fine-tuning
 # ─────────────────────────────────────────
 python scripts/eval_baseline.py \
     --config $CONFIG \
     --output results/baseline_base.json
 
 # ─────────────────────────────────────────
-# 4. Baseline — LLaDA-Instruct, no fine-tuning (best-of-4)
+# 6. Baseline — LLaDA-Instruct, no fine-tuning (best-of-4)
 # ─────────────────────────────────────────
 python scripts/eval_baseline.py \
     --config      $CONFIG \
     --num_samples 4 \
     --output      results/baseline_base_4sample.json
+
+
+
+
